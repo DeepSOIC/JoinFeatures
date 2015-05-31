@@ -104,7 +104,7 @@ class _ConnectObjectsFeature:
         self.Type = "ConnectObjectsFeature"
         obj.addProperty("App::PropertyLink","Feature1","Join","First object of two objects to be joined")
         obj.addProperty("App::PropertyLink","Feature2","Join","Second object of two objects to be joined")
-        #obj.addProperty("App::PropertyBool","ExternalGear","Gear","True=external Gear False=internal Gear ")
+        obj.addProperty("App::PropertyBool","Refine","Join","True = refine resulting shape. False = output as is.")
         
         obj.Proxy = self
         
@@ -114,7 +114,10 @@ class _ConnectObjectsFeature:
         cut1 = shapeOfMaxVol(cut1)
         cut2 = obj.Feature2.Shape.cut(obj.Feature1.Shape)
         cut2 = shapeOfMaxVol(cut2)
-        obj.Shape = cut1.multiFuse([cut2, obj.Feature2.Shape.common(obj.Feature1.Shape)])
+        rst =  cut1.multiFuse([cut2, obj.Feature2.Shape.common(obj.Feature1.Shape)])
+        if obj.Refine:
+            rst = rst.removeSplitter()
+        obj.Shape = rst
         return
         
         
@@ -200,6 +203,7 @@ class _EmbedFeature:
         self.Type = "EmbedFeature"
         obj.addProperty("App::PropertyLink","Base","Join","Base object, the one to embed the other object into.")
         obj.addProperty("App::PropertyLink","Tool","Join","The object to be embedded")
+        obj.addProperty("App::PropertyBool","Refine","Join","True = refine resulting shape. False = output as is.")
         
         obj.Proxy = self
         
@@ -207,7 +211,11 @@ class _EmbedFeature:
     def execute(self,obj):
         cut1 = obj.Base.Shape.cut(obj.Tool.Shape)
         cut1 = shapeOfMaxVol(cut1)
-        obj.Shape = cut1.fuse(obj.Tool.Shape)
+        rst = cut1.fuse(obj.Tool.Shape)
+        if obj.Refine:
+            rst = rst.removeSplitter()
+        obj.Shape = rst
+
         return
         
         
@@ -294,6 +302,7 @@ class _CutoutFeature:
         self.Type = "CutoutFeature"
         obj.addProperty("App::PropertyLink","Base","Join","Base object, the one to embed the other object into.")
         obj.addProperty("App::PropertyLink","Tool","Join","The object to be embedded")
+        obj.addProperty("App::PropertyBool","Refine","Join","True = refine resulting shape. False = output as is.")
         
         obj.Proxy = self
         
@@ -301,6 +310,8 @@ class _CutoutFeature:
     def execute(self,obj):
         cut1 = obj.Base.Shape.cut(obj.Tool.Shape)
         cut1 = shapeOfMaxVol(cut1)
+        if obj.Refine:
+            cut1 = cut1.removeSplitter()
         obj.Shape = cut1
         return
         
