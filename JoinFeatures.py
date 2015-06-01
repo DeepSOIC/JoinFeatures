@@ -22,6 +22,7 @@
 #***************************************************************************
 
 import FreeCAD, Part
+import JoinFeatures_rc
 
 if FreeCAD.GuiUp:
     import FreeCADGui
@@ -104,7 +105,15 @@ class _ViewProviderPartJoinFeature:
         vobj.Proxy = self
        
     def getIcon(self):
-        return ":/icons/PartDesign_InternalExternalGear.svg"
+        if self.Object == None:
+            return getIconPath("Part-joinConnect.svg")
+        else:
+            return getIconPath( {
+                'bypass':"Part-joinBypass.svg",
+                'Connect':"Part-joinConnect.svg",
+                'Embed':"Part-joinEmbed.svg",
+                'Cutout':"Part-joinCutout.svg",
+                }[self.Object.Mode] )
 
     def attach(self, vobj):
         self.ViewObject = vobj
@@ -135,6 +144,9 @@ def CreateJoinFeature(name, mode):
     FreeCADGui.doCommand("j.Tool.ViewObject.hide()")
     FreeCAD.ActiveDocument.commitTransaction()
 
+def getIconPath(icon_dot_svg):
+    return ":/icons/" + icon_dot_svg
+
 # -------------------------- /common stuff --------------------------------------------------
 
 # -------------------------- ConnectObjectsFeature --------------------------------------------------
@@ -142,7 +154,7 @@ def CreateJoinFeature(name, mode):
 class _CommandConnectFeature:
     "Command to create PartJoinFeature in Connect mode"
     def GetResources(self):
-        return {'Pixmap'  : 'PartDesign_InternalExternalGear',
+        return {'Pixmap'  : getIconPath("Part-joinConnect.svg"),
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Part_ConnectFeature","Connect objects..."),
                 'Accel': "",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Part_ConnectFeature","Fuses objects, taking care to preserve voids.")}
@@ -173,7 +185,7 @@ FreeCADGui.addCommand('Part_ConnectFeature',_CommandConnectFeature())
 class _CommandEmbedFeature:
     "Command to create PartJoinFeature in Embed mode"
     def GetResources(self):
-        return {'Pixmap'  : 'PartDesign_InternalExternalGear',
+        return {'Pixmap'  : getIconPath("Part-joinEmbed.svg"),
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Part_EmbedFeature","Embed object"),
                 'Accel': "",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Part_EmbedFeature","Fuses one object into another, taking care to preserve voids.")}
@@ -206,7 +218,7 @@ FreeCADGui.addCommand('Part_EmbedFeature',_CommandEmbedFeature())
 class _CommandCutoutFeature:
     "Command to create PartJoinFeature in Cutout mode"
     def GetResources(self):
-        return {'Pixmap'  : 'PartDesign_InternalExternalGear',
+        return {'Pixmap'  : getIconPath("Part-joinCutout.svg"),
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Part_CutoutFeature","Cutout for object"),
                 'Accel': "",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Part_CutoutFeature","Makes a cutout in one object to fit another object.")}
