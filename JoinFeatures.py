@@ -31,6 +31,23 @@ __title__="JoinFeatures module"
 __author__ = "DeepSOIC"
 __url__ = "http://www.freecadweb.org"
 
+#-------------------------- translation-related code ----------------------------------------
+#Thanks, yorik! (see forum thread "A new Part tool is being born... JoinFeatures!"
+#http://forum.freecadweb.org/viewtopic.php?f=22&t=11112&start=30#p90239 )
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
+#--------------------------/translation-related code ----------------------------------------
+
 # -------------------------- common stuff --------------------------------------------------
 def getParamRefine():
     return FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Part/Boolean").GetBool("RefineModel")
@@ -164,8 +181,8 @@ class _CommandConnectFeature:
         else:
             mb = QtGui.QMessageBox()
             mb.setIcon(mb.Icon.Warning)
-            mb.setText(QtCore.QTranslator().tr("Two solids need to be selected, first!"))
-            mb.setWindowTitle(QtCore.QTranslator().tr("Bad selection"))
+            mb.setText(_translate("Part_JoinFeatures", "Two solids need to be selected, first!", None))
+            mb.setWindowTitle(_translate("Part_JoinFeatures","Bad selection", None))
             mb.exec_()
             
     def IsActive(self):
@@ -195,8 +212,8 @@ class _CommandEmbedFeature:
         else:
             mb = QtGui.QMessageBox()
             mb.setIcon(mb.Icon.Warning)
-            mb.setText(QtCore.QTranslator().tr("Select base object, then the object to embed, and invoke this tool."))
-            mb.setWindowTitle(QtCore.QTranslator().tr("Bad selection"))
+            mb.setText(_translate("Part_JoinFeatures","Select base object, then the object to embed, and invoke this tool.", None))
+            mb.setWindowTitle(_translate("Part_JoinFeatures","Bad selection", None))
             mb.exec_()
 
         
@@ -228,11 +245,10 @@ class _CommandCutoutFeature:
         else:
             mb = QtGui.QMessageBox()
             mb.setIcon(mb.Icon.Warning)
-            mb.setText(QtCore.QTranslator().tr("Select the object to make a cutout in, then the object that should fit into the cutout, and invoke this tool."))
-            mb.setWindowTitle(QtCore.QTranslator().tr("Bad selection"))
+            mb.setText(_translate("Part_JoinFeatures","Select the object to make a cutout in, then the object that should fit into the cutout, and invoke this tool.", None))
+            mb.setWindowTitle(_translate("Part_JoinFeatures","Bad selection", None))
             mb.exec_()
 
-        
     def IsActive(self):
         if FreeCAD.ActiveDocument:
             return True
