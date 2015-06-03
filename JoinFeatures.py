@@ -155,15 +155,34 @@ def CreateJoinFeature(name, mode):
     FreeCADGui.doCommand("j = JoinFeatures.makePartJoinFeature(name = '"+name+"', mode = '"+mode+"' )")
     FreeCADGui.doCommand("j.Base = FreeCADGui.Selection.getSelection()[0]")
     FreeCADGui.doCommand("j.Tool = FreeCADGui.Selection.getSelection()[1]")
-    FreeCADGui.doCommand("j.Proxy.execute(j)")
-    FreeCADGui.doCommand("j.purgeTouched()")
-    FreeCADGui.doCommand("j.Base.ViewObject.hide()")
-    FreeCADGui.doCommand("j.Tool.ViewObject.hide()")
+    FreeCADGui.doCommand("""
+try:
+    j.Proxy.execute(j)
+    j.purgeTouched()
+    j.Base.ViewObject.hide()
+    j.Tool.ViewObject.hide()
+except RuntimeError as e:
+    JoinFeatures.msgBox(
+        JoinFeatures._translate("Part_JoinFeatures","operation failed",None),
+        JoinFeatures._translate("Part_JoinFeatures","#1 failed to compute with the following error: #2",None)
+        .replace(u"#1", unicode(j.Mode, 'utf-8'))
+        .replace(u"#2", unicode(repr(e),'utf-8')))
+    """) # DeepSOIC: I use #1 instead of %1, because doCommand absorbs these %1
     FreeCAD.ActiveDocument.commitTransaction()
+
+
+#-----------------------helpers--------------------
 
 def getIconPath(icon_dot_svg):
     return ":/icons/" + icon_dot_svg
 
+def msgBox(title,text):
+    mb = QtGui.QMessageBox()
+    mb.setIcon(mb.Icon.Warning)
+    mb.setText(text)
+    mb.setWindowTitle(title)
+    mb.exec_()
+    
 # -------------------------- /common stuff --------------------------------------------------
 
 # -------------------------- ConnectObjectsFeature --------------------------------------------------
@@ -180,11 +199,8 @@ class _CommandConnectFeature:
         if len(FreeCADGui.Selection.getSelection()) == 2 :
             CreateJoinFeature(name = "Connect", mode = "Connect")
         else:
-            mb = QtGui.QMessageBox()
-            mb.setIcon(mb.Icon.Warning)
-            mb.setText(_translate("Part_JoinFeatures", "Two solids need to be selected, first!", None))
-            mb.setWindowTitle(_translate("Part_JoinFeatures","Bad selection", None))
-            mb.exec_()
+            msgBox(_translate("Part_JoinFeatures","Bad selection", None), 
+                _translate("Part_JoinFeatures", "Two solids need to be selected, first!", None))
             
     def IsActive(self):
         if FreeCAD.ActiveDocument:
@@ -211,11 +227,8 @@ class _CommandEmbedFeature:
         if len(FreeCADGui.Selection.getSelection()) == 2 :
             CreateJoinFeature(name = "Embed", mode = "Embed")
         else:
-            mb = QtGui.QMessageBox()
-            mb.setIcon(mb.Icon.Warning)
-            mb.setText(_translate("Part_JoinFeatures","Select base object, then the object to embed, and invoke this tool.", None))
-            mb.setWindowTitle(_translate("Part_JoinFeatures","Bad selection", None))
-            mb.exec_()
+            msgBox(_translate("Part_JoinFeatures","Bad selection", None),
+                _translate("Part_JoinFeatures","Select base object, then the object to embed, and invoke this tool.", None))
 
         
     def IsActive(self):
@@ -244,11 +257,8 @@ class _CommandCutoutFeature:
         if len(FreeCADGui.Selection.getSelection()) == 2 :
             CreateJoinFeature(name = "Cutout", mode = "Cutout")
         else:
-            mb = QtGui.QMessageBox()
-            mb.setIcon(mb.Icon.Warning)
-            mb.setText(_translate("Part_JoinFeatures","Select the object to make a cutout in, then the object that should fit into the cutout, and invoke this tool.", None))
-            mb.setWindowTitle(_translate("Part_JoinFeatures","Bad selection", None))
-            mb.exec_()
+            msgBox(_translate("Part_JoinFeatures","Bad selection", None),
+                _translate("Part_JoinFeatures","Select the object to make a cutout in, then the object that should fit into the cutout, and invoke this tool.", None))
 
     def IsActive(self):
         if FreeCAD.ActiveDocument:
