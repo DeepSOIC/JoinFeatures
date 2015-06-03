@@ -67,8 +67,6 @@ class PartWorkbench ( Workbench ):
     ToolTip = "Part workbench"
 
     def Initialize(self):
-        def QT_TRANSLATE_NOOP(scope, text):
-            return text
         # load the module
         import PartGui
         import Part
@@ -76,9 +74,6 @@ class PartWorkbench ( Workbench ):
             import JoinFeatures
         except ImportError:
             print "JoinFeatures module cannot be loaded"
-        self.cmdListJoin = ["Part_EmbedFeature","Part_ConnectObjectsFeature"]
-        #self.appendToolbar(QT_TRANSLATE_NOOP("Workbench","Part Join Tools"),self.cmdListJoin) #DeepSOIC: fails, huh....
-        
 
     def GetClassName(self):
         return "PartGui::Workbench"

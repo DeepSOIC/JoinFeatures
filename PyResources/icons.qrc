@@ -1,8 +1,8 @@
 <RCC>
     <qresource>
-        <file>icons/Part-joinBypass.svg</file>
-        <file>icons/Part-joinConnect.svg</file>
-        <file>icons/Part-joinCutout.svg</file>
-        <file>icons/Part-joinEmbed.svg</file>
+        <file>icons/Part_JoinBypass.svg</file>
+        <file>icons/Part_JoinConnect.svg</file>
+        <file>icons/Part_JoinCutout.svg</file>
+        <file>icons/Part_JoinEmbed.svg</file>
     </qresource>
 </RCC> 
